@@ -1,0 +1,8 @@
+# There might be scenarios where you are booting up Spot instances and OnDemand instances, when working with AWS EC2 instances.
+# Difference between Spot & OnDemand instances are - Pricing & reliability 
+# Read - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html#spot-features for more details
+
+# The below set of instructions work from inside an instance, i.e., you can figure out whether the machine is Spot or OnDemand 
+# - once they are booted. This method doesn't give details of instance type before starting the agent.
+
+# The possible usecase of using this is when you have to switch between Spot & OnDemand 
