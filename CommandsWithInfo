@@ -5,4 +5,35 @@
 # The below set of instructions work from inside an instance, i.e., you can figure out whether the machine is Spot or OnDemand 
 # - once they are booted. This method doesn't give details of instance type before starting the agent.
 
-# The possible usecase of using this is when you have to switch between Spot & OnDemand 
+# The possible usecase of using this is when you have to switch between Spot & OnDemand instances dynamically inside a build.
+# For instance, switch a bigger OnDemand instance, when you have critical part of build that should be assured not to encounter -
+# - infrastructure issues
+
+
+Step 1: Identify the instance ID of the node.
+Step 2: Use the instance ID to extract the meta-data of the instance
+Step 3: Look for an identifier which confirms whether the node is Spot or an OnDemand instance
+
+
+Step1 : curl http://169.254.169.254/latest/meta-data/instance-id
+  This step returns an instance id, let's call it, 'ID'
+  169.254.169.254 is a network address that can be used communications within broadcast domain where the host is connected to.
+  Read more - https://en.wikipedia.org/wiki/Link-local_address 
+
+  http://169.254.169.254/latest/meta-data/ can be used to determined all categories of meta-data.
+  http://169.254.169.254/latest/meta-data/instance-id is used to extract only instance-id from all the categories in meta-data
+  
+ 
+Step2: aws ec2 describe-instances --instance-ids ${ID} --region ${AWSRegionWhereInstanceIsHosted}
+  This step extracts the instance information for the given ID
+  Please note that the region where this instance is hosted should be mentioned explicitly.
+  Read more - https://aws.amazon.com/about-aws/global-infrastructure/regions_az/ 
+  
+Step3: aws ec2 describe-instances --instance-ids ${ID} --region ${AWSRegionWhereInstanceIsHosted} | findstr "SpotInstanceRequestId"
+  Previous step outputs the instance information in JSON format
+  So, use 'findstr' or 'grep' or any platform independent command to extract the exact information, if you use multiple platforms
+  
+Result: The identifier 'SpotInstanceRequestId' is present in instance information, only when it is spot instance.
+
+So, based on the identifier, you can decide whether the agent is Spot or Ondemand instance.
+ 
